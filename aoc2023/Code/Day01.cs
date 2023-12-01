@@ -7,23 +7,9 @@ internal class Day01 : BaseDay
 
     static int GetInt(string row)
     {
-        char a = ' ', b = ' ';
-        int i = 0;
+        var tmp = row.Where(char.IsDigit);
 
-        while (a == ' ' || b == ' ')
-        {
-            if (a == ' ' && char.IsDigit(row[i]))
-            {
-                a = row[i];
-            }
-            if (b == ' ' && char.IsDigit(row[row.Length - 1 - i]))
-            {
-                b = row[row.Length - 1 - i];
-            }
-            i++;
-        }
-
-        return int.Parse($"{a}{b}");
+        return int.Parse($"{tmp.First()}{tmp.Last()}");
     }
 
     static int GetIntExt(string row, List<string> words)
