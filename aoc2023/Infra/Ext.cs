@@ -31,4 +31,6 @@ internal static class Ext
             ++i;
         }
     }
+
+    internal static string Rev(this string s) => string.Join(string.Empty, s.Reverse());
 }
