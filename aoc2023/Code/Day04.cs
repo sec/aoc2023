@@ -36,13 +36,10 @@ internal class Day04 : BaseDay
         {
             var c = queue.Dequeue();
 
-            if (c.Count > 0)
+            for (int i = c.Id + 1; i < c.Id + c.Count + 1; i++)
             {
-                for (int i = c.Id + 1; i < c.Id + c.Count + 1; i++)
-                {
-                    queue.Enqueue(cards[i]);
-                    pile++;
-                }
+                queue.Enqueue(cards[i]);
+                pile++;
             }
         }
 
