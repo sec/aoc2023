@@ -107,11 +107,13 @@ internal class Day07 : BaseDay
             var cards = line[0].ToCharArray();
             var value = int.Parse(line[1]);
             var hand = new Hand(cards, value);
+
             var jokers = PlayWithJokers(cards, value).ToList();
             if (jokers.Count > 0)
             {
                 hand.Strength = jokers.Max(x => x.Strength);
             }
+
             deck.Add(hand);
         }
 
@@ -122,24 +124,26 @@ internal class Day07 : BaseDay
     {
         for (int i = 0; i < cards.Length; i++)
         {
-            if (cards[i] == 'J')
+            if (cards[i] != 'J')
             {
-                foreach (var nc in new[] { 'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2' })
+                continue;
+            }
+
+            foreach (var nc in new[] { 'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2' })
+            {
+                if (!cards.Contains(nc))
                 {
-                    if (!cards.Contains(nc))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var newcards = cards.ToArray();
-                    newcards[i] = nc;
+                var newcards = cards.ToArray();
+                newcards[i] = nc;
 
-                    yield return new Hand(newcards, value);
+                yield return new Hand(newcards, value);
 
-                    foreach (var n in PlayWithJokers(newcards, value))
-                    {
-                        yield return n;
-                    }
+                foreach (var n in PlayWithJokers(newcards, value))
+                {
+                    yield return n;
                 }
             }
         }
