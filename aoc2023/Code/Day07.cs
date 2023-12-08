@@ -2,17 +2,19 @@
 
 internal class Day07 : BaseDay
 {
+    const char JOK3R = 'J';
+
     static readonly Dictionary<char, int> CardsOrder = new()
     {
-            { 'A', 12 }, { 'K', 11 }, { 'Q', 10 }, { 'J', 09 }, { 'T', 08 }, { '9', 07 }, { '8', 06 },
+            { 'A', 12 }, { 'K', 11 }, { 'Q', 10 }, { JOK3R, 09 }, { 'T', 08 }, { '9', 07 }, { '8', 06 },
             { '7', 05 }, { '6', 04 }, { '5', 03 }, { '4', 02 }, { '3', 01 }, { '2', 00 }
     };
 
     class Hand : IComparable
     {
-        public int Strength { get; set; }
-        public int Value { get; private set; }
-        public char[] Cards { get; private set; }
+        public int Strength { get; private set; }
+        public int Value { get; }
+        public char[] Cards { get; }
 
         readonly Dictionary<char, int> _count;
 
@@ -58,6 +60,8 @@ internal class Day07 : BaseDay
             }
         }
 
+        public void PowerUp(int s) => Strength = s;
+
         public int CompareTo(object? obj)
         {
             if (obj is null || obj is not Hand other)
@@ -81,24 +85,9 @@ internal class Day07 : BaseDay
         }
     }
 
-    static long Count(List<Hand> deck)
+    long Solve(int valueJ)
     {
-        deck.Sort();
-        var i = 1;
-
-        return deck.Sum(y => y.Value * i++);
-    }
-
-    protected override object Part1()
-    {
-        CardsOrder['J'] = 9;
-
-        return Count(ReadAllLinesSplit(" ", true).Select(x => new Hand(x[0].ToCharArray(), int.Parse(x[1]))).ToList());
-    }
-
-    protected override object Part2()
-    {
-        CardsOrder['J'] = -1;
+        CardsOrder[JOK3R] = valueJ;
 
         var deck = new List<Hand>();
 
@@ -106,32 +95,38 @@ internal class Day07 : BaseDay
         {
             var cards = line[0].ToCharArray();
             var value = int.Parse(line[1]);
+
             var hand = new Hand(cards, value);
-
-            var jokers = PlayWithJokers(cards, value).ToList();
-            if (jokers.Count > 0)
-            {
-                hand.Strength = jokers.Max(x => x.Strength);
-            }
-
             deck.Add(hand);
+
+            if (valueJ < 0)
+            {
+                var jokers = PlayWithJokers(cards, value).ToList();
+                if (jokers.Count > 0)
+                {
+                    hand.PowerUp(jokers.Max(x => x.Strength));
+                }
+            }
         }
 
-        return Count(deck);
+        deck.Sort();
+        var i = 1;
+
+        return deck.Sum(y => y.Value * i++);
     }
 
     static IEnumerable<Hand> PlayWithJokers(char[] cards, int value)
     {
         for (int i = 0; i < cards.Length; i++)
         {
-            if (cards[i] != 'J')
+            if (cards[i] != JOK3R)
             {
                 continue;
             }
 
-            foreach (var nc in new[] { 'A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2' })
+            foreach (var nc in cards)
             {
-                if (!cards.Contains(nc))
+                if (nc == JOK3R)
                 {
                     continue;
                 }
@@ -148,4 +143,8 @@ internal class Day07 : BaseDay
             }
         }
     }
+
+    protected override object Part1() => Solve(9);
+
+    protected override object Part2() => Solve(-1);
 }

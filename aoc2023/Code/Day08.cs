@@ -107,28 +107,25 @@ internal class Day08 : BaseDay
 
                 if (check.Keys.Count == roots.Count)
                 {
-                    return LCM([.. check.Values]);
+                    return check.Values.SelectMany(Factor).Distinct().Aggregate(1UL, (a, b) => a * b);
                 }
             }
         }
     }
 
-    static ulong LCM(params ulong[] values)
+    static IEnumerable<ulong> Factor(ulong number)
     {
-        var org = values.ToList();
-        var seq = values.ToList();
-
-        while (true)
+        for (var d = 2UL; d * d <= number; d++)
         {
-            var min = seq.Min();
-            var minIndex = seq.IndexOf(min);
-
-            seq[minIndex] += org[minIndex];
-
-            if (seq.All(x => x == seq[0]))
+            while (number % d == 0)
             {
-                return seq.First();
+                yield return d;
+                number /= d;
             }
+        }
+        if (number > 1)
+        {
+            yield return number;
         }
     }
 

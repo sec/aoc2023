@@ -33,4 +33,23 @@ internal static class Ext
     }
 
     internal static string Rev(this string s) => string.Join(string.Empty, s.Reverse());
+
+    internal static ulong LCM(params ulong[] values)
+    {
+        var org = values.ToList();
+        var seq = values.ToList();
+
+        while (true)
+        {
+            var min = seq.Min();
+            var minIndex = seq.IndexOf(min);
+
+            seq[minIndex] += org[minIndex];
+
+            if (seq.All(x => x == seq[0]))
+            {
+                return seq.First();
+            }
+        }
+    }
 }
