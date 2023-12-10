@@ -69,16 +69,14 @@ internal class Day10 : BaseDay
         internal int Solve2()
         {
             var visited = new HashSet<Pos>();
-            var queue = new Queue<Pos>();
+            var fringe = new Stack<Pos>();
             var polygon = new List<Pos>();
 
             visited.Add(_start);
-            queue.Enqueue((_start));
+            fringe.Push((_start));
 
-            while (queue.Count > 0)
+            while (fringe.TryPop(out var check))
             {
-                var check = queue.Dequeue();
-
                 if (_map[check.Y, check.X] is not Pipe.EW and not Pipe.NS)
                 {
                     polygon.Add(check);
@@ -91,10 +89,7 @@ internal class Day10 : BaseDay
                         continue;
                     }
                     visited.Add(n);
-                    queue.Enqueue(n);
-
-                    // go only one way
-                    break;
+                    fringe.Push(n);
                 }
             }
 
