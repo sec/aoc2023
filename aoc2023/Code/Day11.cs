@@ -93,7 +93,7 @@ internal class Day11 : BaseDay
                 var b = pair.Last();
                 var d = _galaxies[a].ManhattanDistance(_galaxies[b]);
 
-                yield return new(pair.First(), pair.Last(), d);
+                yield return new(a, b, d);
             }
         }
     }
