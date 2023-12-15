@@ -2,6 +2,7 @@ namespace aoc2023.Code;
 
 internal class Day14 : BaseDay
 {
+    /*
     class Rock(int x, int y)
     {
         public int X = x;
@@ -96,12 +97,156 @@ internal class Day14 : BaseDay
 
         internal List<(int, int)> State() => _rocks.Select(r => (r.X, r.Y)).ToList();
     }
+    */
 
-    protected override object Part1() => new Platform(ReadAllLines(true)).North().TotalLoad();
+    class PlatformMap
+    {
+        readonly int _height;
+        readonly int _width;
+        readonly char[,] _map;
+
+        public PlatformMap(string[] strings)
+        {
+            _height = strings.Length;
+            _width = strings[0].Length;
+            _map = new char[_height, _width];
+
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    _map[i, j] = strings[i][j];
+                }
+            }
+        }
+
+        internal int TotalLoad()
+        {
+            var s = 0;
+
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    s += _map[i, j] == 'O' ? _height - i : 0;
+                }
+            }
+
+            return s;
+        }
+
+        internal bool Blocked(int x, int y) => _map[y, x] != '.';
+
+        internal PlatformMap North()
+        {
+            for (int i = 1; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    if (_map[i, j] == 'O')
+                    {
+                        var y = i;
+                        while (y - 1 >= 0 && !Blocked(j, y - 1))
+                        {
+                            _map[y - 1, j] = 'O';
+                            _map[y, j] = '.';
+                            y--;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        internal PlatformMap South()
+        {
+            for (int i = _height - 2; i >= 0; i--)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    if (_map[i, j] == 'O')
+                    {
+                        var y = i;
+                        while (y + 1 < _height && !Blocked(j, y + 1))
+                        {
+                            _map[y + 1, j] = 'O';
+                            _map[y, j] = '.';
+                            y++;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        internal PlatformMap West()
+        {
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 1; j < _width; j++)
+                {
+                    if (_map[i, j] == 'O')
+                    {
+                        var x = j;
+                        while (x - 1 >= 0 && !Blocked(x - 1, i))
+                        {
+                            _map[i, x - 1] = 'O';
+                            _map[i, x] = '.';
+                            x--;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        internal PlatformMap East()
+        {
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = _width - 2; j >= 0; j--)
+                {
+                    if (_map[i, j] == 'O')
+                    {
+                        var x = j;
+                        while (x + 1 < _width && !Blocked(x + 1, i))
+                        {
+                            _map[i, x + 1] = 'O';
+                            _map[i, x] = '.';
+                            x++;
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        internal PlatformMap Cycle() => North().West().South().East();
+
+        internal IEnumerable<(int, int)> State()
+        {
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    if (_map[i, j] == 'O')
+                    {
+                        yield return (i, j);
+                    }
+                }
+            }
+        }
+    }
+
+    protected override object Part1() => new PlatformMap(ReadAllLines(true)).North().TotalLoad();
 
     protected override object Part2()
     {
-        var p = new Platform(ReadAllLines(true));
+        var p = new PlatformMap(ReadAllLines(true));
 
         var limit = 1_000_000_000;
         var jump = -1;
@@ -114,7 +259,7 @@ internal class Day14 : BaseDay
                 continue;
             }
 
-            var state = p.State();
+            var state = p.State().ToList();
 
             for (int s = 0; s < states.Count; s++)
             {
