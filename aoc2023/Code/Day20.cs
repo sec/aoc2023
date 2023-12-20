@@ -165,7 +165,7 @@ internal class Day20 : BaseDay
             }
             var hf = _modules.Values.Single(x => x.IsConnectedTo(rx));
 
-            long[] magic = [0, 0, 0, 0];
+            long[] magic = new long[hf.GetState().Length];
             long i = 0;
 
             while (true)
